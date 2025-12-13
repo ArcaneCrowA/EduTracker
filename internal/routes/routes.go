@@ -12,19 +12,16 @@ import (
 func SetupRouter() *gin.Engine {
 	router := gin.Default()
 
-	// Initialize repository and handler
 	userRepo := repository.NewUserRepository()
 	userHandler := handlers.NewUserHandler(userRepo)
 
 	api := router.Group("/api/v1")
 	{
-		// Public routes
 		public := api.Group("/public")
 		{
 			public.POST("/login", userHandler.Login)
 		}
 
-		// Protected routes
 		protected := api.Group("")
 		protected.Use(AuthMiddleware())
 		{
