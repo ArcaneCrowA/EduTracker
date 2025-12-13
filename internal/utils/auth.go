@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"errors"
 	"os"
 	"time"
 
@@ -30,10 +29,6 @@ func GenerateToken(userID uint) (string, error) {
 }
 
 func ValidateToken(tokenString string) (*Claims, error) {
-	if IsTokenBlacklisted(tokenString) {
-		return nil, errors.New("token is blacklisted")
-	}
-
 	claims := &Claims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (any, error) {
 		return jwtKey, nil
@@ -46,12 +41,4 @@ func ValidateToken(tokenString string) (*Claims, error) {
 	}
 	return claims, nil
 
-}
-
-func BlacklistToken(tokenString string) {
-	blacklist[tokenString] = true
-}
-
-func IsTokenBlacklisted(tokenString string) bool {
-	return blacklist[tokenString]
 }
