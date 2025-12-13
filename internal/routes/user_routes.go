@@ -1,15 +1,17 @@
 package routes
 
 import (
-	"github.com/gin-gonic/gin"
-
 	"github.com/arcanecrowa/EduTracker/internal/handlers"
+	"github.com/gin-gonic/gin"
 )
 
-func UserRoutes(rg *gin.RouterGroup) {
+func UserRoutes(rg *gin.RouterGroup, userHandler *handlers.UserHandler) {
 	users := rg.Group("/users")
 	{
-		users.GET("/:id", handlers.GetUser)
-		users.PUT("/:id", handlers.UpdateUser)
+		users.POST("", userHandler.CreateUser)
+		users.GET("/:id", userHandler.GetUser)
+		users.GET("", userHandler.GetAllUsers)
+		users.PUT("/:id", userHandler.UpdateUser)
+		users.DELETE("/:id", userHandler.DeleteUser)
 	}
 }
