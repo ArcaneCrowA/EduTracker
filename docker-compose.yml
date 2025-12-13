@@ -10,6 +10,8 @@ services:
     restart: always
     expose:
       - ${DB_PORT}
+    ports:
+      - "5432:5432"
 
   # backend:
   #   build: Dockerfile
