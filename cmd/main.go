@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/arcanecrowa/EduTracker/internal/routes"
-	database "github.com/arcanecrowa/EduTracker/pkg/db"
+	"github.com/arcanecrowa/EduTracker/pkg/database"
 )
 
 func main() {

@@ -11,21 +11,15 @@ import (
 	"gorm.io/gorm"
 )
 
-var DB *gorm.DB
+var db *gorm.DB
 var Ctx context.Context
 
 func InitDB() {
-	host := os.Getenv("DB_HOST")
-	db_name := os.Getenv("DB_NAME")
-	user := os.Getenv("DB_USER")
-	password := os.Getenv("DB_PASSWORD")
-	port := os.Getenv("DB_PORT")
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Almaty", host, user, password, db_name, port)
+	dsn := dsn_gen()
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %s", err)
 	}
-	DB = db
 
 	Ctx = context.Background()
 
@@ -38,5 +32,15 @@ func InitDB() {
 }
 
 func GetDB() *gorm.DB {
-	return DB
+	return db
+}
+
+func dsn_gen() string {
+	host := os.Getenv("DB_HOST")
+	db_name := os.Getenv("DB_NAME")
+	user := os.Getenv("DB_USER")
+	password := os.Getenv("DB_PASSWORD")
+	port := os.Getenv("DB_PORT")
+
+	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Almaty", host, user, password, db_name, port)
 }
