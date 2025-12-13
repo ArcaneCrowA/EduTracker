@@ -4,8 +4,26 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_DB=news_db
-      - POSTGRES_USER=news_user
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    restart: always
+    expose:
+      - ${DB_PORT}
+
+  # backend:
+  #   build: Dockerfile
+  #   ports:
+  #     - "${APP_PORT}:${APP_PORT}"
+  #   environment:
+  #     - DB_HOST=${DB_HOST}
+  #     - DB_USER=${DB_USER}
+  #     - DB_PASSWORD=${DB_PASSWORD}
+  #     - DB_NAME=${DB_NAME}
+  #     - DB_PORT=${DB_PORT}
+  #     - SERVER_PORT=${APP_PORT}
+  #   depends_on:
+  # - postgres
 
 volumes:
   postgres_data:

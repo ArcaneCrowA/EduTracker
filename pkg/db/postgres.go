@@ -16,10 +16,11 @@ var Ctx context.Context
 
 func InitDB() {
 	host := os.Getenv("DB_HOST")
+	db_name := os.Getenv("DB_NAME")
 	user := os.Getenv("DB_USER")
 	password := os.Getenv("DB_PASSWORD")
 	port := os.Getenv("DB_PORT")
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=edutracker port=%s sslmode=disable TimeZone=Asia/Almaty", host, user, password, port)
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Almaty", host, user, password, db_name, port)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %s", err)
