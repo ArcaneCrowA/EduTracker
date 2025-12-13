@@ -1,0 +1,11 @@
+services:
+  postgres:
+    image: postgres:17
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=news_db
+      - POSTGRES_USER=news_user
+
+volumes:
+  postgres_data:
