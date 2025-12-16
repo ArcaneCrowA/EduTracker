@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"gorm.io/gorm"
 )
 
 func TestDSN(t *testing.T) {
@@ -22,6 +23,20 @@ func TestDSN(t *testing.T) {
 	})
 }
 
+func TestGetDB(t *testing.T) {
+	t.Run("returns the initialized db instance", func(t *testing.T) {
+		originalDB := db
+		defer func() {
+			db = originalDB
+		}()
+		dummyDB := &gorm.DB{}
+		db = dummyDB
+		retrievedDB := GetDB()
+		assert.NotNil(t, retrievedDB, "GetDB should return a non nil *gorm.DB instance")
+		assert.Equal(t, dummyDB, retrievedDB, "GetDB should return the same *gorm.DB instance that was set")
+	})
+}
+
 func restoreENV(t testing.TB) func() {
 	t.Helper()
 	originalHost := os.Getenv("DB_HOST")
@@ -31,10 +46,10 @@ func restoreENV(t testing.TB) func() {
 	originalPort := os.Getenv("DB_PORT")
 
 	return func() {
-		os.Setenv("DB_HOST", originalHost)
-		os.Setenv("DB_NAME", originalName)
-		os.Setenv("DB_USER", originalUser)
-		os.Setenv("DB_PASSWORD", originalPass)
-		os.Setenv("DB_PORT", originalPort)
+		assert.NoError(t, os.Setenv("DB_HOST", originalHost))
+		assert.NoError(t, os.Setenv("DB_NAME", originalName))
+		assert.NoError(t, os.Setenv("DB_USER", originalUser))
+		assert.NoError(t, os.Setenv("DB_PASSWORD", originalPass))
+		assert.NoError(t, os.Setenv("DB_PORT", originalPort))
 	}
 }
