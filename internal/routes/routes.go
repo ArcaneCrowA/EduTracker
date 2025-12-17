@@ -7,12 +7,13 @@ import (
 	"github.com/arcanecrowa/EduTracker/internal/repository"
 	"github.com/arcanecrowa/EduTracker/internal/utils"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
-func SetupRouter() *gin.Engine {
+func SetupRouter(db *gorm.DB) *gin.Engine {
 	router := gin.Default()
 
-	userRepo := repository.NewUserRepository()
+	userRepo := repository.NewUserRepository(db)
 	userHandler := handlers.NewUserHandler(userRepo)
 
 	api := router.Group("/api/v1")
@@ -27,6 +28,14 @@ func SetupRouter() *gin.Engine {
 		{
 			UserRoutes(protected, userHandler)
 			protected.POST("/logout", userHandler.Logout)
+
+			courseRepo := repository.NewCourseRepository(db)
+			courseHandler := handlers.NewCourseHandler(courseRepo)
+			CourseRoutes(protected, courseHandler)
+
+			enrollmentRepo := repository.NewEnrollmentRepository(db)
+			attendanceHandler := handlers.NewAttendanceHandler(enrollmentRepo)
+			AttendanceRoutes(protected, attendanceHandler)
 		}
 	}
 	return router
