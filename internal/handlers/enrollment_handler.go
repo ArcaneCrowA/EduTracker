@@ -87,6 +87,22 @@ func (h *EnrollmentHandler) GetEnrollmentsByUserID(c *gin.Context) {
 	c.JSON(200, enrollments)
 }
 
+// GetAllEnrollments returns all enrollments with related user and course; admin only.
+func (h *EnrollmentHandler) GetAllEnrollments(c *gin.Context) {
+	isAdmin, _ := c.Get("isAdmin")
+	if isAdminBool, ok := isAdmin.(bool); !ok || !isAdminBool {
+		c.JSON(403, gin.H{"error": "admin privileges required"})
+		return
+	}
+
+	enrollments, err := h.EnrollmentRepo.GetAllEnrollmentsWithDetails()
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(200, enrollments)
+}
+
 func (h *EnrollmentHandler) Unenroll(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("userId"))
 	if err != nil {

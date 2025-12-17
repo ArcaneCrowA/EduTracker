@@ -8,6 +8,7 @@ import (
 func EnrollmentRoutes(rg *gin.RouterGroup, enrollmentHandler *handlers.EnrollmentHandler) {
 	enrollments := rg.Group("/enrollments")
 	{
+		enrollments.GET("", enrollmentHandler.GetAllEnrollments)
 		enrollments.POST("/enroll", enrollmentHandler.Enroll)
 		enrollments.GET("/courses/:id", enrollmentHandler.GetEnrollmentsByCourseID)
 		enrollments.GET("/users/:id", enrollmentHandler.GetEnrollmentsByUserID)

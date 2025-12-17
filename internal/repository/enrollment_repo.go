@@ -30,6 +30,12 @@ func (r *EnrollmentRepository) GetEnrollmentsByUserID(userID uint) ([]models.Enr
 	return enrollments, result.Error
 }
 
+func (r *EnrollmentRepository) GetAllEnrollmentsWithDetails() ([]models.Enrollment, error) {
+	var enrollments []models.Enrollment
+	result := r.db.Preload("User").Preload("Course").Find(&enrollments)
+	return enrollments, result.Error
+}
+
 func (r *EnrollmentRepository) DeleteEnrollment(userID, courseID uint) error {
 	result := r.db.Where("user_id = ? AND course_id = ?", userID, courseID).Delete(&models.Enrollment{})
 	return result.Error
