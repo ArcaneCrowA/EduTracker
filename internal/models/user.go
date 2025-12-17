@@ -11,4 +11,5 @@ type User struct {
 	Year     uint   `gorm:"not null" json:"year" example:"3"`
 	Login    string `gorm:"not null" json:"login" example:"johndoe"`
 	Password string `gorm:"not null" json:"password" example:"password123"`
+	IsAdmin  bool   `gorm:"not null;default:false" json:"is_admin" example:"false"`
 }

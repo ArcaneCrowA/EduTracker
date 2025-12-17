@@ -22,6 +22,17 @@ func (h *EnrollmentHandler) Enroll(c *gin.Context) {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
+
+	// allow: admin or the user enrolling themselves
+	isAdminVal, _ := c.Get("isAdmin")
+	userIDVal, _ := c.Get("userID")
+	isAdmin, _ := isAdminVal.(bool)
+	requestUserID, _ := userIDVal.(uint)
+
+	if !isAdmin && requestUserID != enrollment.UserID {
+		c.JSON(403, gin.H{"error": "cannot enroll other users"})
+		return
+	}
 	createdEnrollment, err := h.EnrollmentRepo.CreateEnrollment(&enrollment)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
@@ -36,6 +47,13 @@ func (h *EnrollmentHandler) GetEnrollmentsByCourseID(c *gin.Context) {
 		c.JSON(400, gin.H{"error": "invalid course id"})
 		return
 	}
+
+	// only admins can view enrollments by course (attendance-like info)
+	isAdmin, _ := c.Get("isAdmin")
+	if isAdminBool, ok := isAdmin.(bool); !ok || !isAdminBool {
+		c.JSON(403, gin.H{"error": "admin privileges required"})
+		return
+	}
 	enrollments, err := h.EnrollmentRepo.GetEnrollmentsByCourseID(uint(id))
 	if err != nil {
 		c.JSON(404, gin.H{"error": err.Error()})
@@ -48,6 +66,17 @@ func (h *EnrollmentHandler) GetEnrollmentsByUserID(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(400, gin.H{"error": "invalid user id"})
+		return
+	}
+
+	// allow: admin or the user themselves
+	isAdminVal, _ := c.Get("isAdmin")
+	userIDVal, _ := c.Get("userID")
+	isAdmin, _ := isAdminVal.(bool)
+	requestUserID, _ := userIDVal.(uint)
+
+	if !isAdmin && requestUserID != uint(id) {
+		c.JSON(403, gin.H{"error": "access denied"})
 		return
 	}
 	enrollments, err := h.EnrollmentRepo.GetEnrollmentsByUserID(uint(id))
@@ -67,6 +96,17 @@ func (h *EnrollmentHandler) Unenroll(c *gin.Context) {
 	courseID, err := strconv.Atoi(c.Param("courseId"))
 	if err != nil {
 		c.JSON(400, gin.H{"error": "invalid course id"})
+		return
+	}
+
+	// allow: admin or the user themselves
+	isAdminVal, _ := c.Get("isAdmin")
+	requestUserIDVal, _ := c.Get("userID")
+	isAdmin, _ := isAdminVal.(bool)
+	requestUserID, _ := requestUserIDVal.(uint)
+
+	if !isAdmin && requestUserID != uint(userID) {
+		c.JSON(403, gin.H{"error": "cannot unenroll other users"})
 		return
 	}
 	if err := h.EnrollmentRepo.DeleteEnrollment(uint(userID), uint(courseID)); err != nil {

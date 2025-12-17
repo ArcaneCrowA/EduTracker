@@ -20,6 +20,12 @@ func NewUserHandler(repo *repository.UserRepository) *UserHandler {
 }
 
 func (h *UserHandler) CreateUser(c *gin.Context) {
+	isAdmin, _ := c.Get("isAdmin")
+	if isAdminBool, ok := isAdmin.(bool); !ok || !isAdminBool {
+		c.JSON(http.StatusForbidden, gin.H{"error": "admin privileges required"})
+		return
+	}
+
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
@@ -49,6 +55,12 @@ func (h *UserHandler) GetMe(c *gin.Context) {
 }
 
 func (h *UserHandler) GetUser(c *gin.Context) {
+	isAdmin, _ := c.Get("isAdmin")
+	if isAdminBool, ok := isAdmin.(bool); !ok || !isAdminBool {
+		c.JSON(http.StatusForbidden, gin.H{"error": "admin privileges required"})
+		return
+	}
+
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(400, gin.H{"error": "invalid user id"})
@@ -63,6 +75,12 @@ func (h *UserHandler) GetUser(c *gin.Context) {
 }
 
 func (h *UserHandler) GetAllUsers(c *gin.Context) {
+	isAdmin, _ := c.Get("isAdmin")
+	if isAdminBool, ok := isAdmin.(bool); !ok || !isAdminBool {
+		c.JSON(http.StatusForbidden, gin.H{"error": "admin privileges required"})
+		return
+	}
+
 	users, err := h.UserRepo.GetAllUsers()
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
@@ -72,6 +90,12 @@ func (h *UserHandler) GetAllUsers(c *gin.Context) {
 }
 
 func (h *UserHandler) UpdateUser(c *gin.Context) {
+	isAdmin, _ := c.Get("isAdmin")
+	if isAdminBool, ok := isAdmin.(bool); !ok || !isAdminBool {
+		c.JSON(http.StatusForbidden, gin.H{"error": "admin privileges required"})
+		return
+	}
+
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(400, gin.H{"error": "invalid user id"})
@@ -92,6 +116,12 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 }
 
 func (h *UserHandler) DeleteUser(c *gin.Context) {
+	isAdmin, _ := c.Get("isAdmin")
+	if isAdminBool, ok := isAdmin.(bool); !ok || !isAdminBool {
+		c.JSON(http.StatusForbidden, gin.H{"error": "admin privileges required"})
+		return
+	}
+
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(400, gin.H{"error": "invalid user id"})
@@ -111,6 +141,17 @@ func (h *UserHandler) GetUserCourses(c *gin.Context) {
 		return
 	}
 
+	// allow: admin or the user themselves
+	isAdminVal, _ := c.Get("isAdmin")
+	userIDVal, _ := c.Get("userID")
+	isAdmin, _ := isAdminVal.(bool)
+	requestUserID, _ := userIDVal.(uint)
+
+	if !isAdmin && requestUserID != uint(id) {
+		c.JSON(http.StatusForbidden, gin.H{"error": "access denied"})
+		return
+	}
+
 	courses, err := h.UserRepo.GetUserCourses(id)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
@@ -124,6 +165,17 @@ func (h *UserHandler) GetUserAttendances(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(400, gin.H{"error": "invalid user id"})
+		return
+	}
+
+	// allow: admin or the user themselves
+	isAdminVal, _ := c.Get("isAdmin")
+	userIDVal, _ := c.Get("userID")
+	isAdmin, _ := isAdminVal.(bool)
+	requestUserID, _ := userIDVal.(uint)
+
+	if !isAdmin && requestUserID != uint(id) {
+		c.JSON(http.StatusForbidden, gin.H{"error": "access denied"})
 		return
 	}
 
@@ -152,7 +204,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 		return
 	}
 
-	token, err := utils.GenerateToken(user.ID)
+	token, err := utils.GenerateToken(user.ID, user.IsAdmin)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not generate token"})
 		return

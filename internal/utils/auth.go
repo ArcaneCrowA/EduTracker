@@ -12,14 +12,16 @@ var jwtKey = []byte(os.Getenv("SECRET_KEY"))
 var blacklist = make(map[string]bool)
 
 type Claims struct {
-	UserID uint
+	UserID  uint
+	IsAdmin bool
 	jwt.RegisteredClaims
 }
 
-func GenerateToken(userID uint) (string, error) {
+func GenerateToken(userID uint, isAdmin bool) (string, error) {
 	expirationTime := time.Now().Add(3 * time.Hour)
 	claims := &Claims{
-		UserID: userID,
+		UserID:  userID,
+		IsAdmin: isAdmin,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 		},

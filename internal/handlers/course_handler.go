@@ -17,6 +17,12 @@ func NewCourseHandler(repo *repository.CourseRepository) *CourseHandler {
 }
 
 func (h *CourseHandler) CreateCourse(c *gin.Context) {
+	isAdmin, _ := c.Get("isAdmin")
+	if isAdminBool, ok := isAdmin.(bool); !ok || !isAdminBool {
+		c.JSON(403, gin.H{"error": "admin privileges required"})
+		return
+	}
+
 	var course models.Course
 	if err := c.ShouldBindJSON(&course); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
@@ -54,6 +60,12 @@ func (h *CourseHandler) GetAllCourses(c *gin.Context) {
 }
 
 func (h *CourseHandler) UpdateCourse(c *gin.Context) {
+	isAdmin, _ := c.Get("isAdmin")
+	if isAdminBool, ok := isAdmin.(bool); !ok || !isAdminBool {
+		c.JSON(403, gin.H{"error": "admin privileges required"})
+		return
+	}
+
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(400, gin.H{"error": "invalid course id"})
@@ -74,6 +86,12 @@ func (h *CourseHandler) UpdateCourse(c *gin.Context) {
 }
 
 func (h *CourseHandler) DeleteCourse(c *gin.Context) {
+	isAdmin, _ := c.Get("isAdmin")
+	if isAdminBool, ok := isAdmin.(bool); !ok || !isAdminBool {
+		c.JSON(403, gin.H{"error": "admin privileges required"})
+		return
+	}
+
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(400, gin.H{"error": "invalid course id"})
