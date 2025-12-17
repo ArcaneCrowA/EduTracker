@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/arcanecrowa/EduTracker/internal/routes"
@@ -9,7 +10,10 @@ import (
 )
 
 func main() {
-	database.InitDB(postgres.Open(database.Dsn_gen()))
+	db, err := database.InitDB(postgres.Open(database.Dsn_gen()))
+	if err != nil {
+		fmt.Errorf("couldn't connect to database %v", err)
+	}
 	r := routes.SetupRouter()
 	log.Fatal(r.Run(":8080"))
 }

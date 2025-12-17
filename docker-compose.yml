@@ -13,19 +13,18 @@ services:
     ports:
       - "5432:5432"
 
-  # backend:
-  #   build: Dockerfile
-  #   ports:
-  #     - "${APP_PORT}:${APP_PORT}"
-  #   environment:
-  #     - DB_HOST=${DB_HOST}
-  #     - DB_USER=${DB_USER}
-  #     - DB_PASSWORD=${DB_PASSWORD}
-  #     - DB_NAME=${DB_NAME}
-  #     - DB_PORT=${DB_PORT}
-  #     - SERVER_PORT=${APP_PORT}
-  #   depends_on:
-  # - postgres
+  backend:
+    build: .
+    ports:
+      - "${SERVER}:${SERVER}"
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - DB_PORT=${DB_PORT}
+    depends_on:
+      - postgres
 
 volumes:
   postgres_data:
