@@ -7,35 +7,27 @@ import (
 	"os"
 
 	"github.com/arcanecrowa/EduTracker/internal/models"
-	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-var db *gorm.DB
-var Ctx context.Context
+var Ctx = context.Background()
 
-func InitDB() {
-	dsn := dsn_gen()
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+func InitDB(dialector gorm.Dialector) (*gorm.DB, error) {
+	db, err := gorm.Open(dialector, &gorm.Config{})
 	if err != nil {
-		log.Fatalf("Failed to connect to database: %s", err)
+		return nil, err
 	}
-
-	Ctx = context.Background()
 
 	log.Println("Database connection successful. Running migrations")
 	err = db.AutoMigrate(&models.Course{}, &models.Enrollment{}, &models.User{})
 	if err != nil {
-		log.Fatalf("Migrations failed: %s", err)
+		return nil, err
 	}
 	log.Println("Migrations successfully applied")
+	return db, nil
 }
 
-func GetDB() *gorm.DB {
-	return db
-}
-
-func dsn_gen() string {
+func Dsn_gen() string {
 	host := os.Getenv("DB_HOST")
 	db_name := os.Getenv("DB_NAME")
 	user := os.Getenv("DB_USER")

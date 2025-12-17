@@ -1,11 +1,14 @@
-package database
+package database_test
 
 import (
 	"os"
 	"testing"
 
+	"github.com/arcanecrowa/EduTracker/internal/models"
+	"github.com/arcanecrowa/EduTracker/pkg/database"
 	"github.com/stretchr/testify/assert"
-	"gorm.io/gorm"
+	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
 )
 
 func TestDSN(t *testing.T) {
@@ -19,21 +22,31 @@ func TestDSN(t *testing.T) {
 		assert.Nil(t, os.Setenv("DB_PORT", "5432"))
 
 		expectedDSN := "host=test_host user=test_user password=test_pass dbname=test_name port=5432 sslmode=disable TimeZone=Asia/Almaty"
-		assert.Equal(t, expectedDSN, dsn_gen())
+		assert.Equal(t, expectedDSN, database.Dsn_gen())
 	})
 }
 
-func TestGetDB(t *testing.T) {
-	t.Run("returns the initialized db instance", func(t *testing.T) {
-		originalDB := db
-		defer func() {
-			db = originalDB
-		}()
-		dummyDB := &gorm.DB{}
-		db = dummyDB
-		retrievedDB := GetDB()
-		assert.NotNil(t, retrievedDB, "GetDB should return a non nil *gorm.DB instance")
-		assert.Equal(t, dummyDB, retrievedDB, "GetDB should return the same *gorm.DB instance that was set")
+func TestInitDB(t *testing.T) {
+	t.Run("initialize db", func(t *testing.T) {
+		sqliteDialector := sqlite.Open("file::memory:?cache=shared")
+		db, err := database.InitDB(sqliteDialector)
+		if err != nil {
+			t.Fatalf("InitDB failed unexpectedly: %v", err)
+		}
+		if db == nil {
+			t.Fatal("InitDB returned a nil database object on success")
+		}
+		if !db.Migrator().HasTable(&models.User{}) {
+			t.Error("Migration verification failed: 'courses' table not found.")
+		}
+	})
+	t.Run("failing dsn", func(t *testing.T) {
+		failingDSN := "user=bad password=bad dbname=none port=123 host=127.0.0.1"
+		failingDialector := postgres.Open(failingDSN)
+		_, err := database.InitDB(failingDialector)
+		if err == nil {
+			t.Fatal("Expected InitDB to fail, but it succeeded.")
+		}
 	})
 }
 
