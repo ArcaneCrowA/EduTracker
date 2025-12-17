@@ -42,13 +42,18 @@ func (r *UserRepository) DeleteUser(id int) error {
 
 func (r *UserRepository) GetUserCourses(id int) ([]models.Course, error) {
 	var courses []models.Course
-	result := r.db.Joins("JOIN enrollments ON enrollments.course_id = courses.id").Where("enrollments.user_id = ?", id).Find(&courses)
+	result := r.db.
+		Model(&models.Course{}).
+		Distinct("courses.*").
+		Joins("JOIN enrollments ON enrollments.course_id = courses.id").
+		Where("enrollments.user_id = ?", id).
+		Find(&courses)
 	return courses, result.Error
 }
 
 func (r *UserRepository) GetUserAttendances(id int) ([]models.Enrollment, error) {
 	var attendances []models.Enrollment
-	result := r.db.Where("user_id = ?", id).Find(&attendances)
+	result := r.db.Preload("Course").Where("user_id = ?", id).Find(&attendances)
 	return attendances, result.Error
 }
 
