@@ -6,12 +6,18 @@ import (
 	"github.com/arcanecrowa/EduTracker/internal/handlers"
 	"github.com/arcanecrowa/EduTracker/internal/repository"
 	"github.com/arcanecrowa/EduTracker/internal/utils"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
 func SetupRouter(db *gorm.DB) *gin.Engine {
 	router := gin.Default()
+
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	config.AllowHeaders = append(config.AllowHeaders, "Authorization")
+	router.Use(cors.New(config))
 
 	userRepo := repository.NewUserRepository(db)
 	userHandler := handlers.NewUserHandler(userRepo)
