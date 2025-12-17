@@ -10,8 +10,10 @@ const coursesLink = document.getElementById("courses-link");
 const attendanceLink = document.getElementById("attendance-link");
 const logoutLink = document.getElementById("logout-link");
 const content = document.getElementById("content");
+const currentUser = document.getElementById("current-user");
 
 let jwtToken = null;
+let currentUserData = null;
 
 async function login() {
   const loginData = {
@@ -31,7 +33,9 @@ async function login() {
     if (response.ok) {
       const data = await response.json();
       jwtToken = data.token;
+      currentUserData = data.user;
       localStorage.setItem("jwtToken", jwtToken);
+      displayCurrentUser(currentUserData);
       showInfoView();
     } else {
       alert("Login failed");
@@ -48,6 +52,13 @@ function logout() {
   showLoginView();
 }
 
+function displayCurrentUser(user) {
+  currentUser.innerHTML = `<h2>User Information</h2>
+    <p><strong>ID:</strong> ${user.ID}</p>
+    <p><strong>Name:</strong> ${user.full_name}</p>
+    <p><strong>Login:</strong> ${user.login}</p>`;
+}
+
 function showLoginView() {
   loginView.style.display = "block";
   infoView.style.display = "none";
@@ -56,7 +67,7 @@ function showLoginView() {
 function showInfoView() {
   loginView.style.display = "none";
   infoView.style.display = "block";
-  loadUsers();
+  loadCourses();
 }
 
 async function loadUsers() {
@@ -82,11 +93,14 @@ async function loadUsers() {
 async function loadCourses() {
   content.innerHTML = "<h2>Courses</h2>";
   try {
-    const response = await fetch(`${API_BASE_URL}/courses`, {
-      headers: {
-        Authorization: `Bearer ${jwtToken}`,
+    const response = await fetch(
+      `${API_BASE_URL}/users/${currentUserData.ID}/courses`,
+      {
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+        },
       },
-    });
+    );
     const courses = await response.json();
     courses.forEach((course) => {
       const item = document.createElement("div");
@@ -101,9 +115,25 @@ async function loadCourses() {
 
 async function loadAttendance() {
   content.innerHTML = "<h2>Attendance</h2>";
-  // Assuming we need a user ID to fetch attendance
-  // For now, let's just show a message
-  content.innerHTML += "<p>Select a user to see their attendance.</p>";
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/users/${currentUserData.ID}/attendances`,
+      {
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+        },
+      },
+    );
+    const attendances = await response.json();
+    attendances.forEach((attendance) => {
+      const item = document.createElement("div");
+      item.className = "item";
+      item.textContent = `Course: ${attendance.course_id}, Date: ${attendance.date}, Status: ${attendance.status}`;
+      content.appendChild(item);
+    });
+  } catch (error) {
+    console.error("Error fetching attendance:", error);
+  }
 }
 
 loginBtn.addEventListener("click", login);
@@ -117,7 +147,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const token = localStorage.getItem("jwtToken");
   if (token) {
     jwtToken = token;
-    showInfoView();
+    fetch(`${API_BASE_URL}/users/me`, {
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        currentUserData = data;
+        displayCurrentUser(currentUserData);
+        showInfoView();
+      })
+      .catch((error) => {
+        console.error("Error fetching user data:", error);
+        logout();
+      });
   } else {
     showLoginView();
   }

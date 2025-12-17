@@ -8,6 +8,8 @@ import (
 	"github.com/arcanecrowa/EduTracker/internal/utils"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"gorm.io/gorm"
 )
 
@@ -21,6 +23,8 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 
 	userRepo := repository.NewUserRepository(db)
 	userHandler := handlers.NewUserHandler(userRepo)
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	api := router.Group("/api/v1")
 	{
@@ -40,8 +44,8 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 			CourseRoutes(protected, courseHandler)
 
 			enrollmentRepo := repository.NewEnrollmentRepository(db)
-			attendanceHandler := handlers.NewAttendanceHandler(enrollmentRepo)
-			AttendanceRoutes(protected, attendanceHandler)
+			enrollmentHandler := handlers.NewEnrollmentHandler(enrollmentRepo)
+			EnrollmentRoutes(protected, enrollmentHandler)
 		}
 	}
 	return router

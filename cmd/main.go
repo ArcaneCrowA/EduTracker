@@ -1,7 +1,14 @@
+// @title Example API
+// @version 1.0
+// @description API
+// @host localhost:8080
+// @BasePath /api/v1
 package main
 
 import (
 	"log"
+
+	_ "github.com/arcanecrowa/EduTracker/docs"
 
 	"github.com/arcanecrowa/EduTracker/internal/routes"
 	"github.com/arcanecrowa/EduTracker/pkg/database"
