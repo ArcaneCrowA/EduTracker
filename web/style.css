@@ -50,7 +50,8 @@ nav a:hover {
 }
 
 #content {
-    margin-top: 16px;
+    width: 50%;
+    margin: 16px auto;
     background-color: #ffffff;
     padding: 24px;
     border-radius: 8px;
@@ -137,4 +138,24 @@ button:disabled {
 
 .suggestion-item.selected {
     background-color: #e0f3ff;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.admin-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admin-toggle input {
+    order: 2;
+    /* checkbox on the right */
+}
+
+.admin-toggle {
+    order: 1;
+    /* text on the left */
 }

@@ -1,25 +1,43 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>EduTracker – My Courses</title>
-        <link rel="stylesheet" href="style.css" />
-    </head>
-    <body>
-        <div id="info-view">
-            <nav>
-                <a href="user.html" id="dashboard-link">My Info</a>
-                <a href="#" id="courses-link">My Courses</a>
-                <a href="#" id="attendance-link">My Attendance</a>
-                <a href="#" id="logout-link">Logout</a>
-            </nav>
-            <div id="current-user"></div>
-            <div id="content"></div>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EduTracker – My Courses</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <div id="info-view">
+        <nav>
+            <a href="user.html" id="dashboard-link">My Info</a>
+            <a href="#" id="courses-link">My Courses</a>
+            <a href="#" id="attendance-link">My Attendance</a>
+            <a href="#" id="logout-link">Logout</a>
+        </nav>
+        <div id="current-user"></div>
+        <div id="content">
+            <section id="info-section">
+                <h2>My Info</h2>
+                <div id="info-details"></div>
+            </section>
+
+            <section id="courses-section" class="hidden">
+                <h2>My Courses</h2>
+                <div id="my-courses-list"></div>
+                <button id="show-join-courses-btn" style="margin-top: 16px;">Join course</button>
+                <div id="available-courses" style="margin-top: 16px;"></div>
+            </section>
+
+            <section id="attendance-section" class="hidden">
+                <h2>My Attendance</h2>
+                <div id="attendance-list"></div>
+            </section>
         </div>
+    </div>
 
-        <script src="script.js"></script>
-    </body>
+    <script src="js/main.js" type="module"></script>
+</body>
+
 </html>
-
-
