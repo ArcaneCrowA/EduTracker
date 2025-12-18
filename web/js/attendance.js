@@ -154,7 +154,7 @@ async function confirmAttendanceSelection() {
     const start_date = `${date}T00:00:00Z`;
 
     try {
-        const enrollResp = await fetch(`${API_BASE_URL}/enrollments/enroll`, {
+        const attendanceResp = await fetch(`${API_BASE_URL}/attendances/mark`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -167,8 +167,8 @@ async function confirmAttendanceSelection() {
             }),
         });
 
-        if (!enrollResp.ok) {
-            const text = await enrollResp.text();
+        if (!attendanceResp.ok) {
+            const text = await attendanceResp.text();
             resultEl.textContent = `Failed to mark attendance: ${text}`;
         } else {
             resultEl.textContent = `Attendance marked successfully.`;

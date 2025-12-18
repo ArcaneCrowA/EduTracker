@@ -19,7 +19,7 @@ func InitDB(dialector gorm.Dialector) (*gorm.DB, error) {
 	}
 
 	log.Println("Database connection successful. Running migrations")
-	err = db.AutoMigrate(&models.Course{}, &models.Enrollment{}, &models.User{})
+	err = db.AutoMigrate(&models.Course{}, &models.Attendance{}, &models.User{})
 	if err != nil {
 		return nil, err
 	}

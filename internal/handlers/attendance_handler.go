@@ -8,61 +8,61 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type EnrollmentHandler struct {
-	EnrollmentRepo *repository.EnrollmentRepository
+type AttendanceHandler struct {
+	AttendanceRepo *repository.AttendanceRepository
 }
 
-func NewEnrollmentHandler(repo *repository.EnrollmentRepository) *EnrollmentHandler {
-	return &EnrollmentHandler{EnrollmentRepo: repo}
+func NewAttendanceHandler(repo *repository.AttendanceRepository) *AttendanceHandler {
+	return &AttendanceHandler{AttendanceRepo: repo}
 }
 
-func (h *EnrollmentHandler) Enroll(c *gin.Context) {
-	var enrollment models.Enrollment
-	if err := c.ShouldBindJSON(&enrollment); err != nil {
+func (h *AttendanceHandler) MarkAttendance(c *gin.Context) {
+	var attendance models.Attendance
+	if err := c.ShouldBindJSON(&attendance); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
 
-	// allow: admin or the user enrolling themselves
+	// allow: admin or the user themselves
 	isAdminVal, _ := c.Get("isAdmin")
 	userIDVal, _ := c.Get("userID")
 	isAdmin, _ := isAdminVal.(bool)
 	requestUserID, _ := userIDVal.(uint)
 
-	if !isAdmin && requestUserID != enrollment.UserID {
-		c.JSON(403, gin.H{"error": "cannot enroll other users"})
+	if !isAdmin && requestUserID != attendance.UserID {
+		c.JSON(403, gin.H{"error": "cannot mark attendance for other users"})
 		return
 	}
-	createdEnrollment, err := h.EnrollmentRepo.CreateEnrollment(&enrollment)
+	createdAttendance, err := h.AttendanceRepo.CreateAttendance(&attendance)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(201, createdEnrollment)
+	c.JSON(201, createdAttendance)
 }
 
-func (h *EnrollmentHandler) GetEnrollmentsByCourseID(c *gin.Context) {
+func (h *AttendanceHandler) GetAttendancesByCourseID(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(400, gin.H{"error": "invalid course id"})
 		return
 	}
 
-	// only admins can view enrollments by course (attendance-like info)
+	// only admins can view attendances by course
 	isAdmin, _ := c.Get("isAdmin")
 	if isAdminBool, ok := isAdmin.(bool); !ok || !isAdminBool {
 		c.JSON(403, gin.H{"error": "admin privileges required"})
 		return
 	}
-	enrollments, err := h.EnrollmentRepo.GetEnrollmentsByCourseID(uint(id))
+	attendances, err := h.AttendanceRepo.GetAttendancesByCourseID(uint(id))
 	if err != nil {
 		c.JSON(404, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(200, enrollments)
+	c.JSON(200, attendances)
 }
 
-func (h *EnrollmentHandler) GetEnrollmentsByUserID(c *gin.Context) {
+func (h *AttendanceHandler) GetAttendancesByUserID(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(400, gin.H{"error": "invalid user id"})
@@ -79,31 +79,30 @@ func (h *EnrollmentHandler) GetEnrollmentsByUserID(c *gin.Context) {
 		c.JSON(403, gin.H{"error": "access denied"})
 		return
 	}
-	enrollments, err := h.EnrollmentRepo.GetEnrollmentsByUserID(uint(id))
+	attendances, err := h.AttendanceRepo.GetAttendancesByUserID(uint(id))
 	if err != nil {
 		c.JSON(404, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(200, enrollments)
+	c.JSON(200, attendances)
 }
 
-// GetAllEnrollments returns all enrollments with related user and course; admin only.
-func (h *EnrollmentHandler) GetAllEnrollments(c *gin.Context) {
+func (h *AttendanceHandler) GetAllAttendances(c *gin.Context) {
 	isAdmin, _ := c.Get("isAdmin")
 	if isAdminBool, ok := isAdmin.(bool); !ok || !isAdminBool {
 		c.JSON(403, gin.H{"error": "admin privileges required"})
 		return
 	}
 
-	enrollments, err := h.EnrollmentRepo.GetAllEnrollmentsWithDetails()
+	attendances, err := h.AttendanceRepo.GetAllAttendancesWithDetails()
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(200, enrollments)
+	c.JSON(200, attendances)
 }
 
-func (h *EnrollmentHandler) Unenroll(c *gin.Context) {
+func (h *AttendanceHandler) RemoveAttendance(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("userId"))
 	if err != nil {
 		c.JSON(400, gin.H{"error": "invalid user id"})
@@ -122,10 +121,10 @@ func (h *EnrollmentHandler) Unenroll(c *gin.Context) {
 	requestUserID, _ := requestUserIDVal.(uint)
 
 	if !isAdmin && requestUserID != uint(userID) {
-		c.JSON(403, gin.H{"error": "cannot unenroll other users"})
+		c.JSON(403, gin.H{"error": "cannot remove attendance for other users"})
 		return
 	}
-	if err := h.EnrollmentRepo.DeleteEnrollment(uint(userID), uint(courseID)); err != nil {
+	if err := h.AttendanceRepo.DeleteAttendance(uint(userID), uint(courseID)); err != nil {
 		c.JSON(404, gin.H{"error": err.Error()})
 		return
 	}

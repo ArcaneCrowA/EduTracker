@@ -45,14 +45,14 @@ func (r *UserRepository) GetUserCourses(id int) ([]models.Course, error) {
 	result := r.db.
 		Model(&models.Course{}).
 		Distinct("courses.*").
-		Joins("JOIN enrollments ON enrollments.course_id = courses.id").
-		Where("enrollments.user_id = ?", id).
+		Joins("JOIN attendances ON attendances.course_id = courses.id").
+		Where("attendances.user_id = ?", id).
 		Find(&courses)
 	return courses, result.Error
 }
 
-func (r *UserRepository) GetUserAttendances(id int) ([]models.Enrollment, error) {
-	var attendances []models.Enrollment
+func (r *UserRepository) GetUserAttendances(id int) ([]models.Attendance, error) {
+	var attendances []models.Attendance
 	result := r.db.Preload("Course").Where("user_id = ?", id).Find(&attendances)
 	return attendances, result.Error
 }

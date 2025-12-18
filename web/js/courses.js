@@ -114,7 +114,7 @@ async function joinCourse(courseId) {
         const today = new Date().toISOString().split("T")[0];
         const start_date = `${today}T00:00:00Z`;
 
-        const response = await fetch(`${API_BASE_URL}/enrollments/enroll`, {
+        const response = await fetch(`${API_BASE_URL}/attendances/mark`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

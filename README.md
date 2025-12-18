@@ -41,11 +41,11 @@ All endpoints are prefixed with `/api/v1`.
 | PUT    | `/courses/:id` | Update course details | `{"title": "New Title", ...}` |
 | DELETE | `/courses/:id` | Delete course | None |
 
-#### Enrollments & Attendance
+#### Attendance
 | Method | Endpoint | Description | Request Body |
 |--------|----------|-------------|--------------|
-| GET    | `/enrollments` | Get all enrollments | None |
-| POST   | `/enrollments/enroll` | Enroll / Mark attendance | `{"user_id": 1, "course_id": 1, "start_date": "ISO8601"}` |
-| GET    | `/enrollments/courses/:id` | Get enrollments for course | None |
-| GET    | `/enrollments/users/:id` | Get enrollments for user | None |
-| DELETE | `/enrollments/unenroll/user/:uId/course/:cId` | Unenroll | None |
+| GET    | `/attendances` | Get all attendances | None |
+| POST   | `/attendances/mark` | Mark attendance / Attend | `{"user_id": 1, "course_id": 1, "start_date": "ISO8601"}` |
+| GET    | `/attendances/courses/:id` | Get attendances for course | None |
+| GET    | `/attendances/users/:id` | Get attendances for user | None |
+| DELETE | `/attendances/remove/user/:userId/course/:courseId` | Remove attendance | None |

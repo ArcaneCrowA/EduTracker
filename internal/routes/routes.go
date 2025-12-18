@@ -40,9 +40,9 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 			courseHandler := handlers.NewCourseHandler(courseRepo)
 			CourseRoutes(protected, courseHandler)
 
-			enrollmentRepo := repository.NewEnrollmentRepository(db)
-			enrollmentHandler := handlers.NewEnrollmentHandler(enrollmentRepo)
-			EnrollmentRoutes(protected, enrollmentHandler)
+			attendanceRepo := repository.NewAttendanceRepository(db)
+			attendanceHandler := handlers.NewAttendanceHandler(attendanceRepo)
+			AttendanceRoutes(protected, attendanceHandler)
 		}
 	}
 	return router
